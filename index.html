@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>재고관리 시스템</title>
+    <style>
+        /* 배너 숨김 최적화 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 이 컨테이너를 벗어나는 내용은 숨김 */
+            background-color: #ffffff;
+        }
+
+        /* 아이프레임 스타일 */
+        #appFrame {
+            width: 100%;
+            /* 배너 높이(50px)만큼 키워서 아래가 잘리지 않게 함 */
+            height: calc(100% + 50px); 
+            border: none;
+            
+            /* 배너 높이(50px)만큼 위로 끌어올려서 배너를 숨김 */
+            margin-top: -50px; 
+            
+            /* ★ 아이폰에서 스크롤 부드럽게 만드는 필수 코드 ★ */
+            -webkit-overflow-scrolling: touch; 
+            
+            /* 로딩 전에는 숨겨둠 */
+            display: none; 
+        }
+
+        /* 로딩 메시지 스타일 */
+        #loader {
+            position: fixed; inset: 0; 
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; 
+            font-family: sans-serif; font-size: 14px; color: #666;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로딩 메시지 -->
+    <div id="loader">
+        <div>시스템 연결 중...</div>
+    </div>
+
+    <!-- 구글 앱이 들어갈 액자 -->
+    <iframe id="appFrame"></iframe>
+
+    <script>
+        // ▼▼▼ [수정 필수] 사장님의 주소록(stock_routes.json) CDN 주소 ▼▼▼
+        // 형식: https://cdn.jsdelivr.net/gh/아이디/저장소이름/stock_routes.json
+        const ROUTES_URL = "https://cdn.jsdelivr.net/gh/artpresso/license/stock_routes.json";
+
+        // 1. 주소창의 '?id=...' 값을 가져옴
+        const params = new URLSearchParams(window.location.search);
+        const clientId = params.get('id');
+
+        const loader = document.getElementById('loader');
+        const iframe = document.getElementById('appFrame');
+
+        if (!clientId) {
+            loader.innerHTML = "잘못된 접근입니다.<br>(ID가 없습니다)";
+        } else {
+            // 2. GitHub 주소록에서 ID 검색
+            fetch(ROUTES_URL)
+                .then(response => response.json())
+                .then(routes => {
+                    const realUrl = routes[clientId]; // ID에 해당하는 구글 주소
+
+                    if (realUrl) {
+                        // 3. 주소를 찾으면 아이프레임에 넣고 보여줌
+                        iframe.src = realUrl;
+                        iframe.style.display = 'block'; // 아이프레임 보이기
+                        loader.style.display = 'none';  // 로딩 숨기기
+                    } else {
+                        loader.innerHTML = "등록되지 않은 ID입니다.<br>(" + clientId + ")";
+                    }
+                })
+                .catch(err => {
+                    loader.innerHTML = "서버 연결 실패.<br>잠시 후 다시 시도해주세요.";
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+</html>
