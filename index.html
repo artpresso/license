@@ -2,97 +2,122 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>재고관리 시스템</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ARTPRESSO 재고관리</title>
+
+    <!-- 1. 구글 서버와 미리 악수 (연결 속도 향상) -->
+    <link rel="preconnect" href="https://script.google.com">
+    <link rel="preconnect" href="https://lh3.googleusercontent.com">
+    <link rel="dns-prefetch" href="https://script.google.com">
+
     <style>
-        /* 배너 숨김 최적화 */
+        /* 기본 초기화 */
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* 이 컨테이너를 벗어나는 내용은 숨김 */
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden; /* 스크롤바 숨김 */
             background-color: #ffffff;
+            /* 모바일 터치감 개선 */
+            -webkit-overflow-scrolling: touch; 
         }
 
-        /* 아이프레임 스타일 */
+        /* 아이프레임 스타일 (배너 숨기기 핵심) */
         #appFrame {
+            position: absolute;
+            left: 0;
             width: 100%;
-            /* 배너 높이(50px)만큼 키워서 아래가 잘리지 않게 함 */
-            height: calc(100% + 0px); 
             border: none;
             
-            /* 배너 높이(50px)만큼 위로 끌어올려서 배너를 숨김 */
-            margin-top: 0px; 
+            /* ▼▼▼ [핵심] 상단 배너 가리기 ▼▼▼ */
+            /* 구글 앱 배너 높이만큼 위로 올림 */
+            top: 0px; 
+            /* 잘린 만큼 높이를 더해줌 */
+            height: calc(100% + 0px); 
             
-            /* ★ 아이폰에서 스크롤 부드럽게 만드는 필수 코드 ★ */
-            -webkit-overflow-scrolling: touch; 
-            
-            /* 로딩 전에는 숨겨둠 */
-            display: none; 
+            /* 로딩 전엔 숨김 (흰 화면 깜빡임 방지) */
+            opacity: 0; 
+            transition: opacity 0.4s ease-in-out;
+            z-index: 1;
         }
 
-        /* 로딩 메시지 스타일 */
+        /* 로딩 화면 스타일 */
         #loader {
-            position: fixed; inset: 0; 
+            position: fixed; inset: 0;
             display: flex; flex-direction: column;
-            align-items: center; justify-content: center; 
-            font-family: sans-serif; font-size: 14px; color: #666;
+            align-items: center; justify-content: center;
+            background-color: #fff;
+            z-index: 9999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: #333;
+            transition: opacity 0.4s ease-out, visibility 0.4s;
         }
 
+        /* 스피너 애니메이션 */
         .spinner {
-            width: 30px; height: 30px; border: 3px solid #ddd;
-            border-top-color: #333; border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin-bottom: 15px;
+            width: 32px; height: 32px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .loading-text { font-size: 14px; font-weight: 500; color: #666; }
     </style>
 </head>
 <body>
 
-    <!-- 로딩 메시지 -->
+    <!-- 로딩 화면 -->
     <div id="loader">
-        <div>시스템 연결 중...</div>
+        <div class="spinner"></div>
+        <div class="loading-text" id="statusMsg">시스템 접속 중...</div>
     </div>
 
-    <!-- 구글 앱이 들어갈 액자 -->
-    <iframe id="appFrame"></iframe>
+    <!-- 아이프레임 (스크립트로 주소 주입) -->
+    <iframe id="appFrame" sandbox="allow-top-navigation allow-scripts allow-forms allow-same-origin allow-popups allow-modals"></iframe>
 
     <script>
-        // ▼▼▼ [최적화] 외부 JSON 불러오기(fetch) 제거하고 직접 입력 ▼▼▼
-        // 여기에 아이디와 구글 배포 주소를 직접 적으세요. 
-        // 외부 통신이 사라져서 0.5초 이상 빨라집니다.
+        // ▼▼▼ [설정] 고객사 명단 (여기에 계속 추가하면 됨) ▼▼▼
+        // 외부 JSON을 안 쓰고 여기에 적어야 0.5초 더 빠릅니다.
         const ROUTES = {
-            "test": "https://www.naver.com/",
-            "artpresso": "https://script.google.com/macros/s/AKfycbyUQqAQ7ebtSpPxwXfUdetis7XkN4zy_9L2sM6bZeTYdamHdzCdlA2J39GNmY71U8m7qA/exec"
+            "test": "https://script.google.com/macros/s/테스트_주소/exec",
+            "artpresso": "https://script.google.com/macros/s/AKfycbyUQqAQ7ebtSpPxwXfUdetis7XkN4zy_9L2sM6bZeTYdamHdzCdlA2J39GNmY71U8m7qA/exec",
+            "another": "https://script.google.com/macros/s/다른_고객_주소/exec"
         };
 
-        // 1. 주소창 ID 파싱
-        const params = new URLSearchParams(window.location.search);
-        const clientId = params.get('id');
-        const loaderMsg = document.getElementById('msg');
-        const iframe = document.getElementById('appFrame');
-        const loader = document.getElementById('loader');
+        (function() {
+            // 1. 주소창에서 ?id=값 가져오기
+            const params = new URLSearchParams(window.location.search);
+            const clientId = params.get('id');
+            const loader = document.getElementById('loader');
+            const statusMsg = document.getElementById('statusMsg');
+            const iframe = document.getElementById('appFrame');
 
-        if (!clientId) {
-            loaderMsg.innerHTML = "잘못된 접근입니다.<br>(ID가 없습니다)";
-        } else {
-            // 2. 즉시 주소 찾기 (대기 시간 0초)
-            const realUrl = ROUTES[clientId];
-
-            if (realUrl) {
-                // 구글 앱 로딩 시작
-                iframe.src = realUrl;
-                
-                // [팁] 아이프레임이 로드되면 로딩화면을 없앰 (깜빡임 최소화)
-                iframe.onload = function() {
-                    loader.style.display = 'none';
-                    iframe.style.display = 'block';
-                };
-            } else {
-                loaderMsg.innerHTML = "등록되지 않은 ID입니다.<br>(" + clientId + ")";
+            // 2. ID 검사
+            if (!clientId) {
+                statusMsg.innerText = "잘못된 접근입니다 (ID 누락)";
+                return;
             }
-        }
+
+            const targetUrl = ROUTES[clientId];
+
+            if (!targetUrl) {
+                statusMsg.innerHTML = "등록되지 않은 ID입니다<br>('" + clientId + "')";
+                return;
+            }
+
+            // 3. 아이프레임 로드 시작
+            iframe.src = targetUrl;
+
+            // 4. 로드 완료 감지 (구글 앱이 화면을 다 그리면 로딩바 제거)
+            iframe.onload = function() {
+                // 부드럽게 전환
+                loader.style.opacity = '0';
+                loader.style.visibility = 'hidden';
+                iframe.style.opacity = '1';
+            };
+        })();
     </script>
 </body>
 </html>
