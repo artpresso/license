@@ -1,4 +1,3 @@
 [
-  {"id": "test", "date": "2099-12-31"},
-  {"id": "artpresso", "date": "2099-12-31"}
+  { "id": "chan@artpresso.co.kr", "name": "관리자", "date": "2099-12-31" }
 ]
