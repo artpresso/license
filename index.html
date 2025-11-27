@@ -39,6 +39,13 @@
             align-items: center; justify-content: center; 
             font-family: sans-serif; font-size: 14px; color: #666;
         }
+
+        .spinner {
+            width: 30px; height: 30px; border: 3px solid #ddd;
+            border-top-color: #333; border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin-bottom: 15px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -52,39 +59,39 @@
     <iframe id="appFrame"></iframe>
 
     <script>
-        // ▼▼▼ [수정 필수] 사장님의 주소록(stock_routes.json) CDN 주소 ▼▼▼
-        // 형식: https://cdn.jsdelivr.net/gh/아이디/저장소이름/stock_routes.json
-        const ROUTES_URL = "https://cdn.jsdelivr.net/gh/artpresso/license/stock_routes.json";
+        // ▼▼▼ [최적화] 외부 JSON 불러오기(fetch) 제거하고 직접 입력 ▼▼▼
+        // 여기에 아이디와 구글 배포 주소를 직접 적으세요. 
+        // 외부 통신이 사라져서 0.5초 이상 빨라집니다.
+        const ROUTES = {
+            "test": "https://script.google.com/macros/s/테스트주소/exec",
+            "artpresso": "https://script.google.com/macros/s/AKfycbyUQqAQ7ebtSpPxwXfUdetis7XkN4zy_9L2sM6bZeTYdamHdzCdlA2J39GNmY71U8m7qA/exec"
+        };
 
-        // 1. 주소창의 '?id=...' 값을 가져옴
+        // 1. 주소창 ID 파싱
         const params = new URLSearchParams(window.location.search);
         const clientId = params.get('id');
-
-        const loader = document.getElementById('loader');
+        const loaderMsg = document.getElementById('msg');
         const iframe = document.getElementById('appFrame');
+        const loader = document.getElementById('loader');
 
         if (!clientId) {
-            loader.innerHTML = "잘못된 접근입니다.<br>(ID가 없습니다)";
+            loaderMsg.innerHTML = "잘못된 접근입니다.<br>(ID가 없습니다)";
         } else {
-            // 2. GitHub 주소록에서 ID 검색
-            fetch(ROUTES_URL)
-                .then(response => response.json())
-                .then(routes => {
-                    const realUrl = routes[clientId]; // ID에 해당하는 구글 주소
+            // 2. 즉시 주소 찾기 (대기 시간 0초)
+            const realUrl = ROUTES[clientId];
 
-                    if (realUrl) {
-                        // 3. 주소를 찾으면 아이프레임에 넣고 보여줌
-                        iframe.src = realUrl;
-                        iframe.style.display = 'block'; // 아이프레임 보이기
-                        loader.style.display = 'none';  // 로딩 숨기기
-                    } else {
-                        loader.innerHTML = "등록되지 않은 ID입니다.<br>(" + clientId + ")";
-                    }
-                })
-                .catch(err => {
-                    loader.innerHTML = "서버 연결 실패.<br>잠시 후 다시 시도해주세요.";
-                    console.error(err);
-                });
+            if (realUrl) {
+                // 구글 앱 로딩 시작
+                iframe.src = realUrl;
+                
+                // [팁] 아이프레임이 로드되면 로딩화면을 없앰 (깜빡임 최소화)
+                iframe.onload = function() {
+                    loader.style.display = 'none';
+                    iframe.style.display = 'block';
+                };
+            } else {
+                loaderMsg.innerHTML = "등록되지 않은 ID입니다.<br>(" + clientId + ")";
+            }
         }
     </script>
 </body>
