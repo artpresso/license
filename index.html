@@ -1,122 +1,59 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ARTPRESSO 재고관리</title>
-
-    <!-- 1. 구글 서버와 미리 악수 (연결 속도 향상) -->
-    <link rel="preconnect" href="https://script.google.com">
-    <link rel="preconnect" href="https://lh3.googleusercontent.com">
-    <link rel="dns-prefetch" href="https://script.google.com">
-
+    <title>재고관리 시스템</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
-        /* 기본 초기화 */
+        /* System B와 동일한 스타일 */
         body, html {
             margin: 0; padding: 0;
             width: 100%; height: 100%;
-            overflow: hidden; /* 스크롤바 숨김 */
+            overflow: hidden;
             background-color: #ffffff;
-            /* 모바일 터치감 개선 */
-            -webkit-overflow-scrolling: touch; 
         }
 
-        /* 아이프레임 스타일 (배너 숨기기 핵심) */
         #appFrame {
-            position: absolute;
-            left: 0;
             width: 100%;
             border: none;
-            
-            /* ▼▼▼ [핵심] 상단 배너 가리기 ▼▼▼ */
-            /* 구글 앱 배너 높이만큼 위로 올림 */
+            /* 배너 가리기용 스타일 */
+            position: absolute;
             top: 0px; 
-            /* 잘린 만큼 높이를 더해줌 */
-            height: calc(100% + 0px); 
+            height: calc(100% + 0px);
             
-            /* 로딩 전엔 숨김 (흰 화면 깜빡임 방지) */
-            opacity: 0; 
-            transition: opacity 0.4s ease-in-out;
-            z-index: 1;
+            /* 로딩 전 깜빡임 방지용 (필요 없으면 삭제 가능) */
+            display: none; 
         }
-
-        /* 로딩 화면 스타일 */
-        #loader {
-            position: fixed; inset: 0;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            background-color: #fff;
-            z-index: 9999;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            color: #333;
-            transition: opacity 0.4s ease-out, visibility 0.4s;
-        }
-
-        /* 스피너 애니메이션 */
-        .spinner {
-            width: 32px; height: 32px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #000;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        .loading-text { font-size: 14px; font-weight: 500; color: #666; }
     </style>
 </head>
 <body>
 
-    <!-- 로딩 화면 -->
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="loading-text" id="statusMsg">시스템 접속 중...</div>
-    </div>
-
-    <!-- 아이프레임 (스크립트로 주소 주입) -->
-    <iframe id="appFrame" sandbox="allow-top-navigation allow-scripts allow-forms allow-same-origin allow-popups allow-modals"></iframe>
+    <iframe id="appFrame"></iframe>
 
     <script>
-        // ▼▼▼ [설정] 고객사 명단 (여기에 계속 추가하면 됨) ▼▼▼
-        // 외부 JSON을 안 쓰고 여기에 적어야 0.5초 더 빠릅니다.
+        // ▼▼▼ 여기에 주소 등록 ▼▼▼
         const ROUTES = {
-            "test": "https://script.google.com/macros/s/테스트_주소/exec",
-            "artpresso": "https://script.google.com/macros/s/AKfycbyUQqAQ7ebtSpPxwXfUdetis7XkN4zy_9L2sM6bZeTYdamHdzCdlA2J39GNmY71U8m7qA/exec",
-            "another": "https://script.google.com/macros/s/다른_고객_주소/exec"
+            "test": "https://script.google.com/macros/s/테스트주소/exec",
+            "artpresso": "https://script.google.com/macros/s/AKfycbyUQqAQ7ebtSpPxwXfUdetis7XkN4zy_9L2sM6bZeTYdamHdzCdlA2J39GNmY71U8m7qA/exec"
         };
 
         (function() {
-            // 1. 주소창에서 ?id=값 가져오기
-            const params = new URLSearchParams(window.location.search);
-            const clientId = params.get('id');
-            const loader = document.getElementById('loader');
-            const statusMsg = document.getElementById('statusMsg');
+            // 1. 주소 찾기 (최소한의 JS)
+            const id = new URLSearchParams(window.location.search).get('id');
+            const url = ROUTES[id];
             const iframe = document.getElementById('appFrame');
 
-            // 2. ID 검사
-            if (!clientId) {
-                statusMsg.innerText = "잘못된 접근입니다 (ID 누락)";
-                return;
+            if (url) {
+                // 2. 주소 있으면 바로 주입
+                iframe.src = url;
+                
+                // 3. System B처럼 그냥 둡니다. 
+                // 다만 흰 화면이 싫다면 onload 시점에만 보이게 처리
+                iframe.onload = function() {
+                    iframe.style.display = 'block';
+                };
+            } else {
+                document.body.innerHTML = "<div style='padding:20px'>주소가 잘못되었습니다.</div>";
             }
-
-            const targetUrl = ROUTES[clientId];
-
-            if (!targetUrl) {
-                statusMsg.innerHTML = "등록되지 않은 ID입니다<br>('" + clientId + "')";
-                return;
-            }
-
-            // 3. 아이프레임 로드 시작
-            iframe.src = targetUrl;
-
-            // 4. 로드 완료 감지 (구글 앱이 화면을 다 그리면 로딩바 제거)
-            iframe.onload = function() {
-                // 부드럽게 전환
-                loader.style.opacity = '0';
-                loader.style.visibility = 'hidden';
-                iframe.style.opacity = '1';
-            };
         })();
     </script>
 </body>
