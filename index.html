@@ -27,32 +27,38 @@
 </head>
 <body>
 
+    <div id="loader">시스템 접속 중...</div>
+
     <iframe id="appFrame"></iframe>
 
     <script>
-        // ▼▼▼ 여기에 주소 등록 ▼▼▼
-        const ROUTES = {
+        // ▼▼▼ [고객 관리] 여기에 아이디와 주소만 계속 추가하면 됩니다 ▼▼▼
+        const CLIENTS = {
             "test": "https://www.naver.com",
-            "artpresso": "https://script.google.com/macros/s/AKfycbyaxogpdyTMzqLCNnE3Hc-bBN9s0gdHyO_qZ7iw_-H355q2T0azf3aoo16WvtHtYeDh-w/exec"
+            "artpresso": "https://script.google.com/macros/s/AKfycbyaxogpdyTMzqLCNnE3Hc-bBN9s0gdHyO_qZ7iw_-H355q2T0azf3aoo16WvtHtYeDh-w/exec",
         };
 
         (function() {
-            // 1. 주소 찾기 (최소한의 JS)
-            const id = new URLSearchParams(window.location.search).get('id');
-            const url = ROUTES[id];
+            // 주소창에서 ?id=... 가져오기
+            const clientId = new URLSearchParams(window.location.search).get('id');
+            const targetUrl = CLIENTS[clientId];
+            
             const iframe = document.getElementById('appFrame');
+            const loader = document.getElementById('loader');
 
-            if (url) {
-                // 2. 주소 있으면 바로 주입
-                iframe.src = url;
+            if (targetUrl) {
+                // 주소가 맞으면 아이프레임에 연결
+                iframe.src = targetUrl;
                 
-                // 3. System B처럼 그냥 둡니다. 
-                // 다만 흰 화면이 싫다면 onload 시점에만 보이게 처리
+                // 로딩이 다 되면(onload) -> 아이프레임 보여주고, 로딩글씨 숨기기
                 iframe.onload = function() {
                     iframe.style.display = 'block';
+                    loader.style.display = 'none';
                 };
             } else {
-                document.body.innerHTML = "<div style='padding:20px'>주소가 잘못되었습니다.</div>";
+                // 주소가 틀렸거나 id가 없으면 에러 표시
+                loader.innerHTML = "존재하지 않는 ID입니다.";
+                loader.style.color = "red";
             }
         })();
     </script>
