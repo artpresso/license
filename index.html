@@ -23,12 +23,16 @@
             /* 로딩 전 깜빡임 방지용 (불필요시 삭제 가능) */
             display: none; 
         }
+
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; font-size: 16px; font-family: 'Pretendard', sans-serif; color: #555; line-height: 1.5; z-index: 10; }
+        
     </style>
 </head>
 <body>
 
-    <div id="loader">시스템 접속 중...</div>
-
+    <div id="loader">
+        <div style="margin-bottom: 10px;">🔄</div> 시스템 접속 중...
+    </div>
     <iframe id="appFrame"></iframe>
 
     <script>
@@ -56,9 +60,9 @@
                     loader.style.display = 'none';
                 };
             } else {
-                // 주소가 틀렸거나 id가 없으면 에러 표시
-                loader.innerHTML = "존재하지 않는 ID입니다.";
-                loader.style.color = "red";
+                loader.innerHTML = "<span style='font-size:24px;'>🚫</span><br><br>"
+                                 + "<b>존재하지 않는 ID입니다.</b><br>"
+                                 + "<span style='font-size:13px; color:#999;'>주소를 다시 확인해주세요.</span>";
             }
         })();
     </script>
