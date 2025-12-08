@@ -10,13 +10,12 @@ body, html {
 #appFrame {
     width: 100%;
     border: none;
-    /* 배너 가리기용 스타일 */
-    position: absolute;
+    position: absolute; /* 배너 가리기용 스타일 */
     top: 0px; 
-    height: calc(100% + 0px);
-            
-    /* 로딩 전 깜빡임 방지용 (불필요시 삭제 가능) */
-    display: none; 
+    height: calc(100% + 0px); /* 배너 높이만큼 아이프레임의 높이를 늘림 */
+    /* margin-top: 0px; 배너 높이만큼 아이프레임을 위로 끌어올려 배너를 숨김 */
+    /* display: none; 로딩 전 깜빡임 방지용 (불필요시 삭제 가능) */
+    -webkit-overflow-scrolling: touch; /* 아이폰 스크롤 부드럽게 */
 }
 
 #loader {
@@ -32,4 +31,5 @@ body, html {
     line-height: 1.5;
     z-index: 10;
 }
+
         
