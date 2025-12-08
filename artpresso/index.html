@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>아트재고뷰</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://artpresso.github.io/license/style_i.css">
+</head>
+<body>
+
+    <div id="loader">
+        <div><strong>아트재고뷰</strong></div>
+        <div><span style='font-size:13px; color:#999;'>시스템 접속 중...</span></div>
+    </div>
+
+    <iframe id="appFrame" 
+            src="https://script.google.com/macros/s/AKfycbyaxogpdyTMzqLCNnE3Hc-bBN9s0gdHyO_qZ7iw_-H355q2T0azf3aoo16WvtHtYeDh-w/exec">
+    </iframe>
+
+    <script>
+        const iframe = document.getElementById('appFrame');
+        const loader = document.getElementById('loader');
+
+        // 로딩 완료되면 화면 전환
+        iframe.onload = function() {
+            iframe.style.display = 'block';
+            loader.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
