@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- 고객 배포용 css 포함버전 배너메시지 높이 변경시 수동수정 -->
     <title>아트재고뷰</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="stylesheet" href="https://artpresso.github.io/license/style_i.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.min.css" />
+
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #ffffff; }
+        #appFrame { width: 100%; border: none; position: absolute; top: 0px; height: calc(100% + 0px); display: none; }
+        #loader { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%; font-size: 16px; font-family: 'Pretendard', sans-serif; color: #555; line-height: 1.5; z-index: 10; }
+    </style>
 </head>
 <body>
 
@@ -11,38 +18,20 @@
         <div><strong>아트재고뷰</strong></div>
         <div><span style='font-size:13px; color:#999;'>시스템 접속 중...</span></div>
     </div>
-    <iframe id="appFrame"></iframe>
+
+    <iframe id="appFrame" 
+            src="https://script.google.com/macros/s/AKfycbyaxogpdyTMzqLCNnE3Hc-bBN9s0gdHyO_qZ7iw_-H355q2T0azf3aoo16WvtHtYeDh-w/exec">
+    </iframe>
 
     <script>
-        // [고객 관리] 여기에 아이디와 주소추가
-        const CLIENTS = {
-            "test": "https://www.naver.com",
-            "artpresso": "https://script.google.com/macros/s/AKfycbyaxogpdyTMzqLCNnE3Hc-bBN9s0gdHyO_qZ7iw_-H355q2T0azf3aoo16WvtHtYeDh-w/exec"
+        const iframe = document.getElementById('appFrame');
+        const loader = document.getElementById('loader');
+
+        // 로딩 완료되면 화면 전환
+        iframe.onload = function() {
+            iframe.style.display = 'block';
+            loader.style.display = 'none';
         };
-
-        (function() {
-            // 주소창에서 ?id=... 가져오기
-            const clientId = new URLSearchParams(window.location.search).get('id');
-            const targetUrl = CLIENTS[clientId];
-            
-            const iframe = document.getElementById('appFrame');
-            const loader = document.getElementById('loader');
-
-            if (targetUrl) {
-                // 주소가 맞으면 아이프레임에 연결
-                iframe.src = targetUrl;
-                
-                // 로딩이 다 되면(onload) -> 아이프레임 보여주고, 로딩글씨 숨기기
-                iframe.onload = function() {
-                    iframe.style.display = 'block';
-                    loader.style.display = 'none';
-                };
-            } else {
-                loader.innerHTML = "<span style='font-size:24px;'>🚫</span><br>"
-                                 + "<b>존재하지 않는 ID입니다.</b><br>"
-                                 + "<span style='font-size:13px; color:#999;'>주소를 다시 확인해주세요.</span>";
-            }
-        })();
     </script>
 </body>
 </html>
