@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>아트재고뷰</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="https://artpresso.github.io/license/style_i.css">
+</head>
+<body>
+
+    <div id="loader">
+        <div><strong>아트재고뷰</strong></div>
+        <div><span style='font-size:13px; color:#999;'>시스템 접속 중</span></div>
+    </div>
+
+    <iframe id="appFrame" 
+            src="https://script.google.com/macros/s/AKfycbxAf3tkkwUA3ESgb1qANNJvdrBuvD0NkRCtTMgA_78GuMjRdcPTd7ROQow6Q7NVR-6dMw/exec">
+    </iframe>
+
+    <script>
+        const iframe = document.getElementById('appFrame');
+        const loader = document.getElementById('loader');
+
+        // 로딩 완료되면 화면 전환
+        iframe.onload = function() {
+            iframe.style.display = 'block';
+            loader.style.display = 'none';
+        };
+    </script>
+</body>
+</html>
