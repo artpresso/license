@@ -13,19 +13,32 @@
         <div><span style='font-size:13px; color:#999;'>시스템 접속 중</span></div>
     </div>
 
-    <iframe id="appFrame" 
-            src="https://script.google.com/macros/s/AKfycbxAf3tkkwUA3ESgb1qANNJvdrBuvD0NkRCtTMgA_78GuMjRdcPTd7ROQow6Q7NVR-6dMw/exec">
-    </iframe>
+    <iframe id="appFrame"></iframe>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const scriptId = urlParams.get('id');
+
         const iframe = document.getElementById('appFrame');
         const loader = document.getElementById('loader');
 
-        // 로딩 완료되면 화면 전환
-        iframe.onload = function() {
-            iframe.style.display = 'block';
-            loader.style.display = 'none';
-        };
+        if (scriptId) {
+            // ID가 있으면 연결
+            iframe.src = `https://script.google.com/macros/s/${scriptId}/exec`;
+
+            // 로딩 완료 시 화면 전환
+            iframe.onload = function() {
+                loader.style.display = 'none';
+                iframe.style.display = 'block';
+            };
+        } else {
+            loader.innerHTML = `
+                <div><strong style="color: #e53935;">잘못된 접근입니다</strong></div>
+                <div style="margin-top: 5px;">
+                    <span style="font-size: 13px; color: #666;">주소 뒤에 ID가 없습니다.</span>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
